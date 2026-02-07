@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Hardhat
+artifacts/
+cache/
+coverage/
+typechain-types/
+deployment/
+.env
+
+# Frontend (Vite/React)
+dist/
+build/
+.DS_Store
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.idea/
+.vscode/
+
+# Environment Variables
+!**/.env.example
+
+# Temporary
+.history/
