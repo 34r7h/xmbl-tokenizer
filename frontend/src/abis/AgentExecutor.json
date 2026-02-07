@@ -1,0 +1,253 @@
+[
+  {
+    "inputs": [],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnableInvalidOwner",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "OwnableUnauthorizedAccount",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ReentrancyGuardReentrantCall",
+    "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "strategyId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "StrategyExecuted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "strategyId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "strategyType",
+        "type": "string"
+      }
+    ],
+    "name": "StrategyRegistered",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "strategyId",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes",
+        "name": "actionData",
+        "type": "bytes"
+      }
+    ],
+    "name": "executeStrategy",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "strategyType",
+        "type": "string"
+      },
+      {
+        "internalType": "bytes",
+        "name": "strategyData",
+        "type": "bytes"
+      }
+    ],
+    "name": "registerStrategy",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "strategyId",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bool",
+        "name": "active",
+        "type": "bool"
+      }
+    ],
+    "name": "setStrategyStatus",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "name": "strategies",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "id",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "strategyType",
+        "type": "string"
+      },
+      {
+        "internalType": "bool",
+        "name": "isActive",
+        "type": "bool"
+      },
+      {
+        "internalType": "uint256",
+        "name": "lastExecuted",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "userStrategies",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

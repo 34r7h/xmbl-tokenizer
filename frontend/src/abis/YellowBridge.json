@@ -1,0 +1,138 @@
+[
+  {
+    "inputs": [],
+    "name": "ReentrancyGuardReentrantCall",
+    "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "sessionId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "finalBalance",
+        "type": "uint256"
+      }
+    ],
+    "name": "SessionSettled",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "sessionId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "SessionStarted",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "name": "sessions",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "depositedAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "startTime",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "isActive",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "sessionId",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "finalBalance",
+        "type": "uint256"
+      }
+    ],
+    "name": "settleSession",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "startSession",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

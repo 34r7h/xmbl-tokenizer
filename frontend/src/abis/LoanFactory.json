@@ -1,0 +1,241 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_usdc",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_assetTokenizer",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [],
+    "name": "ReentrancyGuardReentrantCall",
+    "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "loanId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "borrower",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "principal",
+        "type": "uint256"
+      }
+    ],
+    "name": "LoanCreated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "loanId",
+        "type": "uint256"
+      }
+    ],
+    "name": "LoanDefaulted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "loanId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amountPaid",
+        "type": "uint256"
+      }
+    ],
+    "name": "LoanRepaid",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "USDC",
+    "outputs": [
+      {
+        "internalType": "contract IERC20",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "assetTokenizer",
+    "outputs": [
+      {
+        "internalType": "contract AssetTokenizer",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "borrowerLoans",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "collateralTokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "principalUSDC",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "interestRate",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "duration",
+        "type": "uint256"
+      }
+    ],
+    "name": "createLoan",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "loans",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "borrower",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "collateralTokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "principalUSDC",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "interestRate",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "duration",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "startTime",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "totalOwed",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "loanToken",
+        "type": "address"
+      },
+      {
+        "internalType": "enum LoanFactory.LoanStatus",
+        "name": "status",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "loanId",
+        "type": "uint256"
+      }
+    ],
+    "name": "repayLoan",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]
