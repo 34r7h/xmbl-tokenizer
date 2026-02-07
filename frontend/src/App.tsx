@@ -1,8 +1,13 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
 import { useYellowNetwork } from './hooks/useYellowNetwork';
 import { useAgentStrategies } from './hooks/useAgentStrategies';
+import { LoanCreator } from './components/LoanCreator';
+import { YellowTrader } from './components/YellowTrader';
+import { StrategyBuilder } from './components/StrategyBuilder';
+import { LiFiWidget } from '@lifi/widget';
+import type { WidgetConfig } from '@lifi/widget';
 import {
   PlusCircle,
   ArrowLeftRight,
@@ -11,14 +16,44 @@ import {
   ShieldCheck,
   Sparkles,
   Search,
-  LayoutDashboard
+  LayoutDashboard,
+  BarChart3,
+  Globe
 } from 'lucide-react';
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const { isConnected } = useAccount();
-  const { activeSession } = useYellowNetwork();
-  const { parseIntent } = useAgentStrategies();
+  // const { isConnected } = useAccount();
+  // const { activeSession } = useYellowNetwork();
+  // const { parseIntent } = useAgentStrategies();
+
+  const lifiWidgetConfig = useMemo<WidgetConfig>(
+    () => ({
+      integrator: 'XMB Protocol',
+      theme: {
+        palette: {
+          primary: { main: '#00f2ff' },
+          secondary: { main: '#6366f1' },
+          background: {
+            paper: '#0a0a0b',
+            default: '#0a0a0b',
+          },
+        },
+        shape: {
+          borderRadius: 12,
+        },
+        typography: {
+          fontFamily: 'Inter, sans-serif',
+        },
+      },
+      container: {
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+        borderRadius: '16px',
+      },
+    }),
+    []
+  );
 
   return (
     <div className="min-h-screen font-sans">
@@ -56,6 +91,12 @@ function App() {
             active={activeTab === 'ai'}
             onClick={() => setActiveTab('ai')}
           />
+          <NavItem
+            icon={<Globe size={20} />}
+            label="Bridge"
+            active={activeTab === 'bridge'}
+            onClick={() => setActiveTab('bridge')}
+          />
         </div>
 
         <div className="mt-auto pt-6 border-t border-white/5 flex justify-center">
@@ -69,7 +110,10 @@ function App() {
         <header className="flex justify-between items-center mb-10">
           <div>
             <h1 className="text-3xl font-bold text-white mb-2 underline decoration-cyber-cyan/30">
-              Welcome back, Commander
+              {activeTab === 'dashboard' ? 'Welcome back, Commander' :
+                activeTab === 'mint' ? 'Mint & Loan Assets' :
+                  activeTab === 'trading' ? 'Yellow Network Trading' :
+                    activeTab === 'ai' ? 'AI Strategy Lab' : 'Cross-Chain Bridge'}
             </h1>
             <p className="text-slate-400">Your recursive DeFi positions are performing +12.5% above benchmark.</p>
           </div>
@@ -83,75 +127,156 @@ function App() {
           </div>
         </header>
 
-        {/* Dashboard Grid */}
-        <div className="grid grid-cols-12 gap-6">
-          {/* Portfolio Summary */}
-          <div className="col-span-12 lg:col-span-8 glass-card p-6 min-h-[400px]">
-            <div className="flex justify-between items-center mb-8">
-              <h3 className="text-xl font-semibold text-white flex items-center gap-2">
-                <TrendingUp size={20} className="text-cyber-cyan" />
-                Portfolio Performance
-              </h3>
-              <div className="flex gap-2">
-                <TimeFilter label="1H" />
-                <TimeFilter label="1D" active />
-                <TimeFilter label="1W" />
-                <TimeFilter label="1M" />
+        {activeTab === 'dashboard' && (
+          <div className="grid grid-cols-12 gap-6 animate-in fade-in duration-500">
+            {/* Portfolio Summary */}
+            <div className="col-span-12 lg:col-span-8 glass-card p-6 min-h-[400px]">
+              <div className="flex justify-between items-center mb-8">
+                <h3 className="text-xl font-semibold text-white flex items-center gap-2">
+                  <BarChart3 size={20} className="text-cyber-cyan" />
+                  Portfolio Performance
+                </h3>
+                <div className="flex gap-2">
+                  <TimeFilter label="1H" />
+                  <TimeFilter label="1D" active />
+                  <TimeFilter label="1W" />
+                  <TimeFilter label="1M" />
+                </div>
+              </div>
+              <div className="w-full h-72">
+                <PortfolioChart />
               </div>
             </div>
-            {/* Chart Placeholder */}
-            <div className="w-full h-64 bg-slate-900/50 rounded-xl border border-dashed border-white/10 flex items-center justify-center group overflow-hidden relative">
-              <div className="absolute inset-0 bg-gradient-to-t from-cyber-cyan/5 to-transparent"></div>
-              <p className="text-slate-500 font-mono group-hover:text-cyber-cyan transition-colors">Visualizing Recursive Liquidity Layer...</p>
-            </div>
-          </div>
 
-          {/* Quick Stats */}
-          <div className="col-span-12 lg:col-span-4 flex flex-col gap-6">
-            <StatsCard
-              label="Total Value Locked"
-              value="$1,284,500.00"
-              change="+2.4%"
-              positive={true}
-              icon={<Wallet size={24} className="text-vivid-indigo" />}
-            />
-            <StatsCard
-              label="Active Loans"
-              value="12 Positions"
-              change="$240,000 Utilized"
-              positive={true}
-              icon={<ArrowLeftRight size={24} className="text-cyber-cyan" />}
-            />
-            <StatsCard
-              label="Risk Health Score"
-              value="94.2/100"
-              change="Optimal Range"
-              positive={true}
-              icon={<ShieldCheck size={24} className="text-emerald-400" />}
-            />
-          </div>
+            {/* Quick Stats */}
+            <div className="col-span-12 lg:col-span-4 flex flex-col gap-6">
+              <StatsCard
+                label="Total Value Locked"
+                value="$1,284,500.00"
+                change="+2.4%"
+                positive={true}
+                icon={<Wallet size={24} className="text-vivid-indigo" />}
+              />
+              <StatsCard
+                label="Active Loans"
+                value="12 Positions"
+                change="$240,000 Utilized"
+                positive={true}
+                icon={<ArrowLeftRight size={24} className="text-cyber-cyan" />}
+              />
+              <StatsCard
+                label="Risk Health Score"
+                value="94.2/100"
+                change="Optimal Range"
+                positive={true}
+                icon={<ShieldCheck size={24} className="text-emerald-400" />}
+              />
+            </div>
 
-          {/* AI Insights Section */}
-          <div className="col-span-12 glass-card p-1 mt-2 bg-gradient-to-r from-vivid-indigo/20 via-cyber-cyan/20 to-vivid-indigo/20">
-            <div className="bg-obsidian rounded-2xl p-6 flex flex-col md:flex-row items-center gap-6">
-              <div className="w-16 h-16 rounded-full bg-vivid-indigo/20 flex items-center justify-center animate-pulse">
-                <Sparkles size={32} className="text-cyber-cyan" />
+            {/* AI Insights Section */}
+            <div className="col-span-12 glass-card p-1 mt-2 bg-gradient-to-r from-vivid-indigo/20 via-cyber-cyan/20 to-vivid-indigo/20">
+              <div className="bg-obsidian rounded-2xl p-6 flex flex-col md:flex-row items-center gap-6">
+                <div className="w-16 h-16 rounded-full bg-vivid-indigo/20 flex items-center justify-center animate-pulse">
+                  <Sparkles size={32} className="text-cyber-cyan" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-lg font-bold text-white mb-1">AI Agent Insight: Rebalancing Opportunity</h4>
+                  <p className="text-slate-400">Current loan token concentration on Ethereum is suboptimal. Slippage via LI.FI is currently at a 24h low (-0.02% from median).</p>
+                </div>
+                <button className="btn-primary flex items-center gap-2 whitespace-nowrap" onClick={() => setActiveTab('ai')}>
+                  Execute Rebalance
+                  <ArrowLeftRight size={18} />
+                </button>
               </div>
-              <div className="flex-1">
-                <h4 className="text-lg font-bold text-white mb-1">AI Agent Insight: Rebalancing Opportunity</h4>
-                <p className="text-slate-400">Current loan token concentration on Ethereum is suboptimal. Slippage via LI.FI is currently at a 24h low (-0.02% from median).</p>
-              </div>
-              <button className="btn-primary flex items-center gap-2 whitespace-nowrap">
-                Fast Rebalance via LI.FI
-                <ArrowLeftRight size={18} />
-              </button>
             </div>
           </div>
-        </div>
+        )}
+
+        {activeTab === 'mint' && (
+          <div className="max-w-4xl animate-in slide-in-from-bottom-4 duration-500">
+            <LoanCreator />
+          </div>
+        )}
+
+        {activeTab === 'trading' && (
+          <div className="max-w-4xl animate-in slide-in-from-bottom-4 duration-500">
+            <YellowTrader />
+          </div>
+        )}
+
+        {activeTab === 'ai' && (
+          <div className="max-w-4xl animate-in slide-in-from-bottom-4 duration-500">
+            <StrategyBuilder />
+          </div>
+        )}
+
+        {activeTab === 'bridge' && (
+          <div className="max-w-4xl animate-in slide-in-from-bottom-4 duration-500">
+            <div className="glass-card p-6">
+              <h2 className="text-2xl font-bold text-white mb-6">Cross-Chain Bridge</h2>
+              <div className="w-full h-[700px]">
+                <LiFiWidget config={lifiWidgetConfig} />
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
 }
+
+function PortfolioChart() {
+  const data = [
+    { name: '00:00', value: 400 },
+    { name: '04:00', value: 300 },
+    { name: '08:00', value: 600 },
+    { name: '12:00', value: 800 },
+    { name: '16:00', value: 500 },
+    { name: '20:00', value: 900 },
+    { name: '23:59', value: 1200 },
+  ];
+
+  return (
+    <ResponsiveContainer width="100%" height="100%">
+      <AreaChart data={data}>
+        <defs>
+          <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="#00f2ff" stopOpacity={0.3} />
+            <stop offset="95%" stopColor="#00f2ff" stopOpacity={0} />
+          </linearGradient>
+        </defs>
+        <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
+        <XAxis
+          dataKey="name"
+          stroke="#475569"
+          fontSize={10}
+          tickLine={false}
+          axisLine={false}
+        />
+        <YAxis
+          stroke="#475569"
+          fontSize={10}
+          tickLine={false}
+          axisLine={false}
+          tickFormatter={(value) => `$${value}`}
+        />
+        <Tooltip
+          contentStyle={{ backgroundColor: '#0a0a0b', borderColor: '#ffffff20', borderRadius: '12px' }}
+          itemStyle={{ color: '#00f2ff' }}
+        />
+        <Area
+          type="monotone"
+          dataKey="value"
+          stroke="#00f2ff"
+          fillOpacity={1}
+          fill="url(#colorValue)"
+          strokeWidth={3}
+        />
+      </AreaChart>
+    </ResponsiveContainer>
+  );
+}
+
 
 function NavItem({ icon, label, active = false, onClick }: { icon: React.ReactNode, label: string, active?: boolean, onClick?: () => void }) {
   return (
