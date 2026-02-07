@@ -1,14 +1,25 @@
-# Li.Fi Integration Requirements
+# Feature: Li.Fi Integration - Execution Guide
 
-## Overview
-Enable cross-chain collateral deposits and portfolio rebalancing.
+## 1. Objective
+Enable cross-chain collateral deposits and portfolio rebalancing via the LI.FI SDK. 
 
-## Requirements
-- [ ] Implement `CrossChainManager.js` using Li.Fi SDK
-- [ ] Enable deposit from any chain to Arc Network (USDC)
-- [ ] Enable cross-chain rebalancing logic for AI agents
-- [ ] Verify route execution on testnet
+> [!IMPORTANT]
+> **Coherence Rule**: Refer to `development-master.md` during ALL coding phases to ensure technical alignment with the master plan.
 
-## Dependencies
-- @lifi/sdk
-- @lifi/widget (for frontend)
+## 2. Technical Specifications (Exact Parity)
+
+### 2.1 CrossChainManager.js
+- **Method `depositCollateralFromAnyChain`**:
+  - Must use `lifi.getQuote` with `toToken: 'USDC'` on Arc.
+  - Must execute `lifi.executeRoute`.
+- **Method `rebalancePortfolio`**:
+  - Must iterate `portfolio.positions`.
+  - Must compare `position.chain` with `targetChain` and execute routes for non-matching chains.
+
+## 3. Implementation Roadmap
+1. [ ] **CrossChainManager.js** (SDK logic)
+2. [ ] **Integration Tests** (Mock chain responses or local testnet)
+
+## 4. Agent Entry Point
+**Current Task**: Logic Implementation.
+**Next Action**: Implement `CrossChainManager.js` following the code on lines 880-941 of `development-master.md`.

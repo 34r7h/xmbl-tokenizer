@@ -1256,7 +1256,7 @@ describe("Full Platform Flow", function () {
 # Demo Video Script (3 minutes)
 
 ## Scene 1: Introduction (30s)
-"Hi, I'm presenting our DeFi Collateralized Loan Tokenization Platform built for HackMoney 2025.
+"Hi, I'm presenting our DeFi Collateralized Loan Tokenization Platform built for HackMoney 2026.
 
 We've created a meta-tokenization system where users can:
 - Tokenize real-world assets
@@ -1496,11 +1496,11 @@ Special thanks to:
 - **Arc Network** for providing the economic OS for RWA-backed credit
 - **Yellow Network** for enabling instant, gasless DeFi trading
 - **LI.FI** for cross-chain liquidity infrastructure
-- **ETHGlobal** for hosting HackMoney 2025
+- **ETHGlobal** for hosting HackMoney 2026
 
 ---
 
-**Built with ❤️ for HackMoney 2025**
+**Built with ❤️ for HackMoney 2026**
 ```
 
 ---

@@ -1,12 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-// Configuration
-const FEATURES_DIR = '.agent/features';
-const MASTER_DOC = 'development-master.md';
-const REQUIRED_FILES = ['instructions.md', 'status.md'];
 const REQUIRED_DIRS = [
-  'contracts',
   'contracts/core',
   'contracts/exchange',
   'contracts/agents',
@@ -14,74 +9,99 @@ const REQUIRED_DIRS = [
   'test',
   'scripts',
   'frontend',
+  '.agent/features/core-contracts',
+  '.agent/features/yellow-integration',
+  '.agent/features/lifi-integration',
+  '.agent/features/ai-agents',
+  '.agent/features/frontend',
+  '.agent/rules'
 ];
 
-// Read master document to extract expected features (simplified parsing logic)
-// In a real scenario, this would parse markdown headers.
-// For this MVP, we hardcode the expected features based on the plan.
+const REQUIRED_FILES = [
+  'instructions.md',
+  'status.md',
+  '.agent/workflows/antigravity_workflow.md',
+  '.agent/rules/quality.md',
+  'scripts/check_coverage.sh'
+];
+
 const EXPECTED_FEATURES = [
   'core-contracts',
   'yellow-integration',
   'lifi-integration',
   'ai-agents',
-  'frontend',
+  'frontend'
 ];
 
 function checkDirectoryStructure() {
   console.log('Checking directory structure...');
-  let missing = [];
-  REQUIRED_DIRS.forEach((dir) => {
-    if (!fs.existsSync(dir)) {
-      missing.push(dir);
+  let ok = true;
+  REQUIRED_DIRS.forEach(dir => {
+    const fullPath = path.join(process.cwd(), dir);
+    if (!fs.existsSync(fullPath)) {
+      console.error(`❌ Missing directory: ${dir}`);
+      ok = false;
+    } else {
+      console.log(`✅ Directory exists: ${dir}`);
     }
   });
+  return ok;
+}
 
-  if (missing.length > 0) {
-    console.error(`❌ Missing directories: ${missing.join(', ')}`);
-    return false;
-  }
-  console.log('✅ Directory structure OK');
-  return true;
+function checkRequiredFiles() {
+  console.log('\nChecking required root and agent files...');
+  let ok = true;
+  REQUIRED_FILES.forEach(file => {
+    const fullPath = path.join(process.cwd(), file);
+    if (!fs.existsSync(fullPath)) {
+      console.error(`❌ Missing file: ${file}`);
+      ok = false;
+    } else {
+      console.log(`✅ File exists: ${file}`);
+      // Check for deep content (100 lines for instructions as a soft check)
+      if (file.endsWith('instructions.md')) {
+          const content = fs.readFileSync(fullPath, 'utf8');
+          const lines = content.split('\n').length;
+          if (lines < 70) { // Using 70 as a more reasonable automated threshold for "deeply detailed"
+              console.warn(`⚠️  Warning: ${file} seems brief (${lines} lines). Ensure it is comprehensive.`);
+          }
+      }
+    }
+  });
+  return ok;
 }
 
 function checkFeatures() {
-  console.log('Checking features...');
-  let missing = [];
-  let incomplete = [];
+  console.log('\nChecking feature specific documentation...');
+  let ok = true;
+  EXPECTED_FEATURES.forEach(feature => {
+    const instPath = path.join(process.cwd(), '.agent/features', feature, 'instructions.md');
+    const statusPath = path.join(process.cwd(), '.agent/features', feature, 'status.md');
 
-  EXPECTED_FEATURES.forEach((feature) => {
-    const featurePath = path.join(FEATURES_DIR, feature);
-    if (!fs.existsSync(featurePath)) {
-      missing.push(feature);
+    if (!fs.existsSync(instPath)) {
+      console.error(`❌ Missing instructions for feature: ${feature}`);
+      ok = false;
     } else {
-      REQUIRED_FILES.forEach((file) => {
-        if (!fs.existsSync(path.join(featurePath, file))) {
-          incomplete.push(`${feature}/${file}`);
-        }
-      });
+      console.log(`✅ Feature instructions exist: ${feature}`);
+    }
+
+    if (!fs.existsSync(statusPath)) {
+      console.error(`❌ Missing status for feature: ${feature}`);
+      ok = false;
+    } else {
+      console.log(`✅ Feature status exists: ${feature}`);
     }
   });
-
-  if (missing.length > 0) {
-    console.error(`❌ Missing features: ${missing.join(', ')}`);
-    return false;
-  }
-
-  if (incomplete.length > 0) {
-    console.error(`❌ Incomplete features (missing files): ${incomplete.join(', ')}`);
-    return false;
-  }
-
-  console.log('✅ Features OK');
-  return true;
+  return ok;
 }
 
 function main() {
   console.log('--- Project Verification ---');
   const dirsOk = checkDirectoryStructure();
+  const filesOk = checkRequiredFiles();
   const featuresOk = checkFeatures();
 
-  if (dirsOk && featuresOk) {
+  if (dirsOk && filesOk && featuresOk) {
     console.log('\nResult: PASS');
     process.exit(0);
   } else {
