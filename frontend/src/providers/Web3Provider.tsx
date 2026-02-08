@@ -12,6 +12,8 @@ import {
     arbitrum,
     base,
     sepolia,
+    hardhat,
+    localhost,
 } from 'wagmi/chains';
 import {
     QueryClientProvider,
@@ -24,7 +26,7 @@ import type { ReactNode } from 'react';
 const config = getDefaultConfig({
     appName: 'XMB Protocol',
     projectId: 'YOUR_PROJECT_ID', // Placeholder for now
-    chains: [mainnet, polygon, optimism, arbitrum, base, sepolia],
+    chains: [mainnet, polygon, optimism, arbitrum, base, sepolia, hardhat, localhost],
     ssr: true, // If your environment supports SSR
 });
 

@@ -6,6 +6,10 @@ import { YellowTrader } from './components/YellowTrader';
 import { StrategyBuilder } from './components/StrategyBuilder';
 import { PositionManager } from './components/PositionManager';
 import { ActiveStrategies } from './components/ActiveStrategies';
+import { InsuranceLab } from './components/InsuranceLab';
+import { PortfolioManager } from './components/PortfolioManager';
+import { LiquidityPool } from './components/LiquidityPool';
+import { DevAccountSwitcher } from './components/DevAccountSwitcher';
 import { LiFiWidget } from '@lifi/widget';
 import type { WidgetConfig } from '@lifi/widget';
 import {
@@ -18,7 +22,9 @@ import {
   Search,
   LayoutDashboard,
   BarChart3,
-  Globe
+  Globe,
+  Package,
+  Droplets
 } from 'lucide-react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 
@@ -100,6 +106,24 @@ function App() {
             active={activeTab === 'bridge'}
             onClick={() => setActiveTab('bridge')}
           />
+          <NavItem
+            icon={<ShieldCheck size={20} />}
+            label="Insurance"
+            active={activeTab === 'insurance'}
+            onClick={() => setActiveTab('insurance')}
+          />
+          <NavItem
+            icon={<Package size={20} />}
+            label="Portfolios"
+            active={activeTab === 'portfolios'}
+            onClick={() => setActiveTab('portfolios')}
+          />
+          <NavItem
+            icon={<Droplets size={20} />}
+            label="Liquidity"
+            active={activeTab === 'liquidity'}
+            onClick={() => setActiveTab('liquidity')}
+          />
         </div>
 
         <div className="mt-auto pt-6 border-t border-white/5 flex justify-center">
@@ -124,7 +148,10 @@ function App() {
                   {activeTab === 'dashboard' ? 'Welcome back, Commander' :
                     activeTab === 'mint' ? 'Mint & Loan Assets' :
                       activeTab === 'trading' ? 'Yellow Network Trading' :
-                        activeTab === 'ai' ? 'AI Strategy Lab' : 'Cross-Chain Bridge'}
+                        activeTab === 'ai' ? 'AI Strategy Lab' :
+                          activeTab === 'bridge' ? 'Cross-Chain Bridge' :
+                            activeTab === 'insurance' ? 'Insurance Lab' :
+                              activeTab === 'portfolios' ? 'Portfolio Manager' : 'Liquidity Pools'}
                 </h1>
                 <p className="text-slate-400">Your recursive DeFi positions are performing +12.5% above benchmark.</p>
               </div>
@@ -237,9 +264,28 @@ function App() {
                 </div>
               </div>
             )}
+
+            {activeTab === 'insurance' && (
+              <div className="max-w-5xl">
+                <InsuranceLab />
+              </div>
+            )}
+
+            {activeTab === 'portfolios' && (
+              <div className="max-w-6xl">
+                <PortfolioManager />
+              </div>
+            )}
+
+            {activeTab === 'liquidity' && (
+              <div className="max-w-5xl">
+                <LiquidityPool />
+              </div>
+            )}
           </motion.div>
         </AnimatePresence>
       </main>
+      <DevAccountSwitcher />
     </div>
   );
 }
