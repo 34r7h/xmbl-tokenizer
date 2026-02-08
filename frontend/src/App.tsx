@@ -7,6 +7,7 @@ import { Dashboard } from './pages/Dashboard';
 import { Trading } from './pages/Trading';
 import { Bridge } from './pages/Bridge';
 import { MintLoan, Strategies, Portfolios, Liquidity, Insurance } from './pages/Wrappers';
+import { Deployer } from './pages/Deployer';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path="/insurance" element={<Insurance />} />
           <Route path="/portfolios" element={<Portfolios />} />
           <Route path="/liquidity" element={<Liquidity />} />
+          <Route path="/deploy" element={<Deployer />} />
         </Routes>
       </Layout>
       <DevAccountSwitcher />

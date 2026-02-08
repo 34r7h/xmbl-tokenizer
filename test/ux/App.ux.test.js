@@ -1,5 +1,5 @@
 /**
- * XMB Protocol - UX & Integration Test Specification [App.ux.test.js]
+ * XMBL Tokenizer - UX & Integration Test Specification [App.ux.test.js]
  * 
  * Objective: Verify the full E2E cycle from RWA Tokenization to Trading.
  * Mode: Browser-driven Interaction Test
@@ -16,7 +16,7 @@ const UX_TEST_SPEC = {
           target: 'Dashboard',
           action: 'Verify Initial State',
           assertions: [
-            'App name "XMB Protocol" visible',
+            'App name "XMBL Tokenizer" visible',
             'Portfolio Chart rendered',
             'Active RWA Positions table visible'
           ]

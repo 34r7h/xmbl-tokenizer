@@ -1,19 +1,25 @@
-import { useState } from 'react';
-import { useWriteContract, useAccount } from 'wagmi';
+import { useState, useEffect } from 'react';
+import { useWriteContract, useAccount, useReadContract, useWaitForTransactionReceipt, useSwitchChain } from 'wagmi';
 import { parseUnits } from 'viem';
 import { useContractConfig } from '../contracts/useContractConfig';
-import { PlusCircle, Info, ShieldCheck, CheckCircle2, Loader2, X } from 'lucide-react';
+import { PlusCircle, Info, ShieldCheck, CheckCircle2, Loader2, X, Lock } from 'lucide-react';
 
 export function LoanCreator({ assetTokenId = "1" }: { assetTokenId?: string }) {
+    console.log("LoanCreator: Component Rendering...");
     const [principal, setPrincipal] = useState('');
     const [interestRate, setInterestRate] = useState('5');
     const [duration, setDuration] = useState('365');
     const [showSuccess, setShowSuccess] = useState(false);
 
-    const { isConnected, address } = useAccount();
+    const { isConnected, address, chainId } = useAccount();
+    const { switchChain } = useSwitchChain();
     const { getContract } = useContractConfig();
 
-    const { writeContract: createLoan, isPending } = useWriteContract({
+    // Force Localhost/Hardhat (31337)
+    const TARGET_CHAIN_ID = 31337;
+    const isWrongNetwork = isConnected && chainId !== TARGET_CHAIN_ID;
+
+    const { writeContract: createLoan, isPending: isCreating } = useWriteContract({
         mutation: {
             onSuccess: (data) => {
                 console.log("Arc: Loan Created Successfully!", data);
@@ -25,6 +31,62 @@ export function LoanCreator({ assetTokenId = "1" }: { assetTokenId?: string }) {
             }
         }
     });
+
+    // 1. Check Ownership
+    const assetTokenizer = getContract('AssetTokenizer');
+    const loanFactory = getContract('LoanFactory');
+
+    const { data: ownerOfAsset } = useReadContract({
+        address: assetTokenizer?.address,
+        abi: assetTokenizer?.abi,
+        functionName: 'ownerOf',
+        args: [BigInt(assetTokenId)],
+        query: {
+            enabled: !!assetTokenizer && isConnected,
+            refetchInterval: 2000
+        }
+    });
+
+    // 2. Check Approval
+    const { data: isApprovedForAll, refetch: refetchApproval } = useReadContract({
+        address: assetTokenizer?.address,
+        abi: assetTokenizer?.abi,
+        functionName: 'isApprovedForAll',
+        args: [address, loanFactory?.address],
+        query: {
+            enabled: !!assetTokenizer && !!loanFactory && isConnected,
+            refetchInterval: 2000
+        }
+    });
+
+    const isOwner = ownerOfAsset === address;
+    const isApproved = isApprovedForAll === true;
+
+    // 3. Approve Action
+    const { writeContract: approveAsset, data: approveTxHash, isPending: isApproving } = useWriteContract();
+
+    const { isLoading: isWaitingApproval } = useWaitForTransactionReceipt({
+        hash: approveTxHash,
+        query: {
+            enabled: !!approveTxHash,
+        }
+    });
+
+    useEffect(() => {
+        if (approveTxHash && !isWaitingApproval) {
+            refetchApproval();
+        }
+    }, [approveTxHash, isWaitingApproval, refetchApproval]);
+
+    const handleApprove = () => {
+        if (!assetTokenizer || !loanFactory) return;
+        approveAsset({
+            address: assetTokenizer.address,
+            abi: assetTokenizer.abi,
+            functionName: 'setApprovalForAll',
+            args: [loanFactory.address, true]
+        });
+    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -105,14 +167,43 @@ export function LoanCreator({ assetTokenId = "1" }: { assetTokenId?: string }) {
                     <p>This will tokenize your RWA as collateral and mint tradable loan tokens. Liquidity providers can then fund your loan instantly.</p>
                 </div>
 
-                <button
-                    type="submit"
-                    disabled={!isConnected || !principal || isPending}
-                    className="btn-primary mt-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                    {isPending ? <Loader2 className="animate-spin" size={20} /> : null}
-                    {isPending ? 'Processing Agreement...' : isConnected ? 'Authorize & Create Loan' : 'Connect Wallet to Continue'}
-                </button>
+                {!isConnected ? (
+                    <button disabled className="btn-primary mt-2 opacity-50 cursor-not-allowed">
+                        Connect Wallet to Continue
+                    </button>
+                ) : isWrongNetwork ? (
+                    <button
+                        type="button"
+                        onClick={() => switchChain({ chainId: TARGET_CHAIN_ID })}
+                        className="btn-primary mt-2 bg-amber-500 hover:bg-amber-600 border-amber-500/50 text-white"
+                    >
+                        Switch to Localhost
+                    </button>
+                ) : !isOwner && ownerOfAsset ? (
+                    <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-xl text-center">
+                        <p className="text-rose-400 text-sm font-bold">You do not own Asset #{assetTokenId}.</p>
+                        <p className="text-slate-400 text-xs mt-1">Acquire the asset or tokenize a new one.</p>
+                    </div>
+                ) : !isApproved ? (
+                    <button
+                        type="button"
+                        onClick={handleApprove}
+                        disabled={isApproving || isWaitingApproval}
+                        className="w-full py-3 bg-cyber-indigo hover:bg-cyber-indigo/80 text-white font-bold rounded-xl transition-all shadow-lg shadow-cyber-indigo/20 flex items-center justify-center gap-2"
+                    >
+                        {isApproving || isWaitingApproval ? <Loader2 className="animate-spin" size={20} /> : <Lock size={20} />}
+                        {isApproving ? 'Approving...' : isWaitingApproval ? 'Confirming Approval...' : 'Approve Collateral Transfer'}
+                    </button>
+                ) : (
+                    <button
+                        type="submit"
+                        disabled={!principal || isCreating}
+                        className="btn-primary mt-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                        {isCreating ? <Loader2 className="animate-spin" size={20} /> : null}
+                        {isCreating ? 'Processing Agreement...' : 'Authorize & Create Loan'}
+                    </button>
+                )}
             </form>
 
             {/* Success Modal Overlay */}

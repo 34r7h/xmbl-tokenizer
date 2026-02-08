@@ -43,7 +43,7 @@ export function StrategyBuilder() {
 
             <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-2">
-                    <label className="text-sm font-medium text-slate-400 italic">"What would you like the XMB Agent to do?"</label>
+                    <label className="text-sm font-medium text-slate-400 italic">"What would you like the XMBL Agent to do?"</label>
                     <div className="relative">
                         <textarea
                             placeholder="e.g., Rebalance my loan portfolio if Ethereum volatility exceeds 40% and APY on Arc is above 8%."

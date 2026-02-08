@@ -14,7 +14,8 @@ import {
     Menu,
     ChevronLeft,
     ChevronRight,
-    X
+    X,
+    Rocket
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -52,7 +53,7 @@ export function Layout({ children }: LayoutProps) {
             case '/insurance': return 'Insurance Lab';
             case '/portfolios': return 'Portfolio Manager';
             case '/liquidity': return 'Liquidity Pools';
-            default: return 'XMB Protocol';
+            default: return 'XMBL Tokenizer';
         }
     };
 
@@ -111,6 +112,7 @@ export function Layout({ children }: LayoutProps) {
                     <NavItem to="/insurance" icon={<ShieldCheck size={20} />} label="Insurance" active={location.pathname === '/insurance'} collapsed={isCollapsed} />
                     <NavItem to="/portfolios" icon={<Package size={20} />} label="Portfolios" active={location.pathname === '/portfolios'} collapsed={isCollapsed} />
                     <NavItem to="/liquidity" icon={<Droplets size={20} />} label="Liquidity" active={location.pathname === '/liquidity'} collapsed={isCollapsed} />
+                    <NavItem to="/deploy" icon={<Rocket size={20} />} label="Deploy" active={location.pathname === '/deploy'} collapsed={isCollapsed} />
                 </nav>
 
                 {/* Toggle Collapse Button (Desktop Only) */}

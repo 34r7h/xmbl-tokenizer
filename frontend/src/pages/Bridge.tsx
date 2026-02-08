@@ -5,7 +5,7 @@ import type { WidgetConfig } from '@lifi/widget';
 export function Bridge() {
     const lifiWidgetConfig = useMemo<WidgetConfig>(
         () => ({
-            integrator: 'XMB Protocol',
+            integrator: 'XMBL Tokenizer',
             theme: {
                 palette: {
                     primary: { main: '#00f2ff' },
@@ -33,7 +33,7 @@ export function Bridge() {
 
     const lifiWidgetProps = useMemo(() => ({
         config: lifiWidgetConfig,
-        integrator: 'XMB Protocol',
+        integrator: 'XMBL Tokenizer',
     }), [lifiWidgetConfig]);
 
     return (

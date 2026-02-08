@@ -61,7 +61,7 @@ const connectors = connectorsForWallets(
         },
     ],
     {
-        appName: 'XMB Protocol',
+        appName: 'XMBL Tokenizer',
         projectId: 'YOUR_PROJECT_ID',
     }
 );
