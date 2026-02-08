@@ -71,4 +71,39 @@ contract AssetTokenizer is ERC721, Ownable {
         require(_ownerOf(tokenId) != address(0), "Asset does not exist");
         return assets[tokenId];
     }
+
+    // --- View Functions for Frontend ---
+
+    function getAssetCount() external view returns (uint256) {
+        return _tokenIdCounter;
+    }
+
+    function getUserAssets(address user) external view returns (uint256[] memory) {
+        uint256 balance = balanceOf(user);
+        uint256[] memory tokens = new uint256[](balance);
+        uint256 counter = 0;
+        for (uint256 i = 0; i < _tokenIdCounter; i++) {
+            if (_ownerOf(i) == user) {
+                tokens[counter] = i;
+                counter++;
+                if (counter == balance) break;
+            }
+        }
+        return tokens;
+    }
+
+    /**
+     * @dev Efficiently fetches all asset details for a user in one call
+     * @param user The address of the user
+     * @return assetsData An array of Asset structs owned by the user
+     * @return tokenIds The corresponding token IDs
+     */
+    function getUserAssetDetails(address user) external view returns (Asset[] memory assetsData, uint256[] memory tokenIds) {
+        tokenIds = this.getUserAssets(user);
+        assetsData = new Asset[](tokenIds.length);
+        for (uint256 i = 0; i < tokenIds.length; i++) {
+            assetsData[i] = assets[tokenIds[i]];
+        }
+        return (assetsData, tokenIds);
+    }
 }

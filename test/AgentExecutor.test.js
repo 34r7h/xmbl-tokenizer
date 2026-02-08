@@ -45,20 +45,26 @@ describe("AgentExecutor", function () {
       const strategyType = "rebalancing";
       const strategyData = "0x";
       
-      // Fix timestamp for next block
-      const timestamp = (await ethers.provider.getBlock("latest")).timestamp + 100;
-      await ethers.provider.send("evm_setNextBlockTimestamp", [timestamp]);
-      await ethers.provider.send("evm_mine");
+      // Disable auto-mining to include multiple txs in one block
+      await ethers.provider.send("evm_setAutomine", [false]);
 
-      // First registration
-      await agentExecutor.connect(user).registerStrategy(strategyType, ethers.hexlify(ethers.toUtf8Bytes(strategyData)));
+      // Submit two identical transactions
+      const tx1 = await agentExecutor.connect(user).registerStrategy(strategyType, ethers.hexlify(ethers.toUtf8Bytes(strategyData)));
+      
+      // The second one should fail upon execution because it generates the same ID in the same block
+      const tx2 = await agentExecutor.connect(user).registerStrategy(strategyType, ethers.hexlify(ethers.toUtf8Bytes(strategyData)));
 
-      // Second registration with SAME timestamp and SAME params (must set next block timestamp again)
-      await ethers.provider.send("evm_setNextBlockTimestamp", [timestamp]);
-      // Note: In real life timestamps increment, but for test coverage of the require check:
-      await expect(
-        agentExecutor.connect(user).registerStrategy(strategyType, ethers.hexlify(ethers.toUtf8Bytes(strategyData)))
-      ).to.be.revertedWith("Strategy ID collision");
+      // Mine the block containing both txs
+      await ethers.provider.send("evm_mine", []);
+      
+      // Re-enable auto-mining
+      await ethers.provider.send("evm_setAutomine", [true]);
+
+      // First one should succeed
+      await tx1.wait();
+
+      // Second one should fail
+      await expect(tx2.wait()).to.be.reverted;
     });
   });
 

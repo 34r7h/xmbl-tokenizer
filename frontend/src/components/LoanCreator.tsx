@@ -1,16 +1,15 @@
 import { useState } from 'react';
 import { useWriteContract, useAccount } from 'wagmi';
 import { parseUnits } from 'viem';
-import LoanFactoryABI from '../abis/LoanFactory.json';
+import { useContractConfig } from '../contracts/useContractConfig';
 import { PlusCircle, Info } from 'lucide-react';
-
-const LOAN_FACTORY_ADDRESS = '0x0000000000000000000000000000000000000000'; // Placeholder
 
 export function LoanCreator({ assetTokenId = "1" }: { assetTokenId?: string }) {
     const [principal, setPrincipal] = useState('');
     const [interestRate, setInterestRate] = useState('5');
     const [duration, setDuration] = useState('365');
     const { isConnected } = useAccount();
+    const { getContract } = useContractConfig();
 
     const { writeContract: createLoan } = useWriteContract();
 
@@ -18,9 +17,12 @@ export function LoanCreator({ assetTokenId = "1" }: { assetTokenId?: string }) {
         e.preventDefault();
         if (!isConnected) return;
 
+        const loanFactory = getContract('LoanFactory');
+        if (!loanFactory) return;
+
         createLoan({
-            address: LOAN_FACTORY_ADDRESS,
-            abi: LoanFactoryABI,
+            address: loanFactory.address,
+            abi: loanFactory.abi,
             functionName: 'createLoan',
             args: [
                 BigInt(assetTokenId),

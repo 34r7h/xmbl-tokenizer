@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { useYellowNetwork } from '../hooks/useYellowNetwork';
 import { parseEther, parseUnits } from 'viem';
-import { ArrowLeftRight, Zap, TrendingUp, TrendingDown } from 'lucide-react';
+import { ArrowLeftRight, Zap, TrendingUp, TrendingDown, Wallet } from 'lucide-react';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 export function YellowTrader({ loanToken = "0x..." }: { loanToken?: string }) {
     const [amount, setAmount] = useState('');
     const [price, setPrice] = useState('');
-    const { placeOrder, activeSession } = useYellowNetwork();
+    const { placeOrder, activeSession, startSession, isConnected } = useYellowNetwork();
 
     const handleLimitOrder = async (side: 'buy' | 'sell') => {
         if (!amount || !price) return;
@@ -65,22 +66,50 @@ export function YellowTrader({ loanToken = "0x..." }: { loanToken?: string }) {
                     />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 mt-2">
-                    <button
-                        onClick={() => handleLimitOrder('buy')}
-                        className="flex items-center justify-center gap-2 px-6 py-3 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 font-bold rounded-xl transition-all active:scale-95 group"
-                    >
-                        <TrendingUp size={18} className="group-hover:-translate-y-1 transition-transform" />
-                        Buy LTK
-                    </button>
-                    <button
-                        onClick={() => handleLimitOrder('sell')}
-                        className="flex items-center justify-center gap-2 px-6 py-3 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 font-bold rounded-xl transition-all active:scale-95 group"
-                    >
-                        <TrendingDown size={18} className="group-hover:translate-y-1 transition-transform" />
-                        Sell LTK
-                    </button>
-                </div>
+                {!isConnected ? (
+                    <div className="flex flex-col gap-4 mt-2">
+                        <div className="p-4 bg-slate-900/50 border border-white/10 rounded-xl text-center">
+                            <p className="text-slate-400 text-sm mb-3">
+                                Connect your wallet to access Yellow Network gas-free trading.
+                            </p>
+                            <div className="flex justify-center">
+                                <ConnectButton />
+                            </div>
+                        </div>
+                    </div>
+                ) : !activeSession ? (
+                    <div className="flex flex-col gap-4 mt-2">
+                        <div className="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-xl text-center">
+                            <p className="text-yellow-200 text-sm mb-3">
+                                To trade gas-free on Yellow Network, you must first start a session and deposit collateral.
+                            </p>
+                            <button
+                                onClick={() => startSession("", "1000")} // Empty string triggers default USDC usage in hook
+                                className="w-full py-3 bg-yellow-500 hover:bg-yellow-400 text-obsidian font-bold rounded-xl transition-all shadow-lg shadow-yellow-500/20 flex items-center justify-center gap-2"
+                            >
+                                <Zap size={18} />
+                                Start Trading Session (1000 USDC)
+                            </button>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-2 gap-4 mt-2">
+                        <button
+                            onClick={() => handleLimitOrder('buy')}
+                            className="flex items-center justify-center gap-2 px-6 py-3 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 font-bold rounded-xl transition-all active:scale-95 group"
+                        >
+                            <TrendingUp size={18} className="group-hover:-translate-y-1 transition-transform" />
+                            Buy LTK
+                        </button>
+                        <button
+                            onClick={() => handleLimitOrder('sell')}
+                            className="flex items-center justify-center gap-2 px-6 py-3 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 font-bold rounded-xl transition-all active:scale-95 group"
+                        >
+                            <TrendingDown size={18} className="group-hover:translate-y-1 transition-transform" />
+                            Sell LTK
+                        </button>
+                    </div>
+                )}
             </div>
 
             {activeSession && (

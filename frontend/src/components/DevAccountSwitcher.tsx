@@ -18,14 +18,19 @@ export function DevAccountSwitcher() {
     if (!import.meta.env.DEV) return null;
 
     const handleDevLogin = () => {
-        // In this specific hackathon setup, we can't easily inject a private key into RainbowKit
-        // But we can trigger a connection to the 'Injected' or 'MetaMask' connector 
-        // if the browser agent has one, or simply provide the instructions.
+        console.log("Available Connectors:", connectors.map(c => ({ id: c.id, name: c.name })));
 
-        // For automated verification, we'll look for a connector that might be available
-        const injectedConnector = connectors.find(c => c.id === 'injected');
-        if (injectedConnector) {
-            connect({ connector: injectedConnector });
+        // Try to find by ID 'hardhat' (set in wallet config) or 'mock' (default)
+        // RainbowKit might prefix ids?
+        const devConnector = connectors.find(c => c.id === 'hardhat' || c.name === 'Hardhat Dev' || c.id === 'mock');
+
+        if (devConnector) {
+            connect({ connector: devConnector });
+        } else {
+            console.error("Hardhat/Mock connector not found. Check Web3Provider config.");
+            // Fallback: match any mock connector
+            const anyMock = connectors.find(c => c.type === 'mock');
+            if (anyMock) connect({ connector: anyMock });
         }
     };
 

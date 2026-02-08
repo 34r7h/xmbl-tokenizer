@@ -134,4 +134,23 @@ contract LoanFactory is ReentrancyGuard {
         }
         return string(buffer);
     }
+
+    // --- View Functions for Frontend ---
+
+    function getLoanCount() external view returns (uint256) {
+        return _loanIdCounter;
+    }
+
+    function getUserLoans(address user) external view returns (uint256[] memory) {
+        return borrowerLoans[user];
+    }
+
+    function getUserLoanDetails(address user) external view returns (Loan[] memory) {
+        uint256[] memory ids = borrowerLoans[user];
+        Loan[] memory userLoans = new Loan[](ids.length);
+        for (uint256 i = 0; i < ids.length; i++) {
+            userLoans[i] = loans[ids[i]];
+        }
+        return userLoans;
+    }
 }

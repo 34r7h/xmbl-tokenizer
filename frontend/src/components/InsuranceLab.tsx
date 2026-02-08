@@ -20,7 +20,10 @@ export function InsuranceLab() {
                 <div className="space-y-6">
                     <div className="space-y-2">
                         <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Select Loan Position</label>
-                        <select className="w-full glass-card bg-white/5 border-white/10 px-4 py-3 text-white focus:neon-border outline-none appearance-none">
+                        <select
+                            className="w-full glass-card bg-white/5 border-white/10 px-4 py-3 text-white focus:neon-border outline-none appearance-none"
+                            defaultValue="Loan #0 - Commercial Real Estate ($100,000)"
+                        >
                             <option>Loan #0 - Commercial Real Estate ($100,000)</option>
                             <option>Loan #1 - Asset-Backed Invoice ($25,000)</option>
                         </select>

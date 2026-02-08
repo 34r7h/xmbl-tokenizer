@@ -1,13 +1,50 @@
 import { motion } from 'framer-motion';
-import { ShieldCheck, ArrowUpRight, TrendingUp } from 'lucide-react';
-
-const POSITIONS = [
-    { id: 1, asset: 'Industrial Property #42', value: '$250,000', yield: '8.5%', ltv: '65%', health: 92 },
-    { id: 2, asset: 'Logistics Hub B1', value: '$120,000', yield: '7.2%', ltv: '40%', health: 98 },
-    { id: 3, asset: 'Retail Complex Neo', value: '$500,000', yield: '9.1%', ltv: '75%', health: 85 },
-];
+import { ShieldCheck, ArrowUpRight, TrendingUp, Loader2 } from 'lucide-react';
+import { useUserLoans } from '../hooks/useUserLoans';
+import { formatUnits } from 'viem';
 
 export function PositionManager() {
+    const { loans, isLoading } = useUserLoans();
+
+    // Process data
+    const positions = loans?.map((loan: any) => {
+        // loan is the struct
+        // Handle both object (if ABI names) and array (if not)
+        const id = (loan.id || loan[0])?.toString();
+        const principalVal = loan.principalUSDC || loan[3];
+        const rateVal = loan.interestRate || loan[4];
+
+        const rate = Number(rateVal) / 100;
+        const principal = principalVal ? formatUnits(principalVal, 6) : "0";
+
+        return {
+            id: id,
+            asset: `Loan #${id}`,
+            value: `$${Number(principal).toLocaleString()}`,
+            yield: `${rate}%`,
+            ltv: '80%', // Hardcoded
+            health: 98 // Hardcoded
+        };
+    }) || [];
+
+    if (isLoading) {
+        return (
+            <div className="glass-card p-6 flex justify-center items-center h-40">
+                <Loader2 className="animate-spin text-cyber-cyan" size={32} />
+            </div>
+        );
+    }
+
+    if (positions.length === 0) {
+        return (
+            <div className="glass-card p-6 flex flex-col justify-center items-center h-40 gap-2">
+                <ShieldCheck className="text-slate-600" size={32} />
+                <p className="text-slate-400 font-medium">No active positions found.</p>
+                <p className="text-xs text-slate-500">Create a loan in "Mint & Loan" to get started.</p>
+            </div>
+        );
+    }
+
     return (
         <div className="glass-card p-6 overflow-hidden">
             <div className="flex items-center justify-between mb-6">
@@ -23,15 +60,15 @@ export function PositionManager() {
                     <thead>
                         <tr className="text-slate-500 text-[10px] uppercase tracking-widest font-bold">
                             <th className="pb-2 px-4">Asset Identification</th>
-                            <th className="pb-2 px-4">Locked Value</th>
-                            <th className="pb-2 px-4">Target Yield</th>
+                            <th className="pb-2 px-4">Principal Value</th>
+                            <th className="pb-2 px-4">APY Interest</th>
                             <th className="pb-2 px-4">LTV Ratio</th>
                             <th className="pb-2 px-6">Risk Health</th>
                             <th className="pb-2 px-4"></th>
                         </tr>
                     </thead>
                     <tbody>
-                        {POSITIONS.map((pos, i) => (
+                        {positions.map((pos, i) => (
                             <motion.tr
                                 key={pos.id}
                                 initial={{ opacity: 0, x: -20 }}
@@ -42,7 +79,7 @@ export function PositionManager() {
                                 <td className="py-4 px-4 rounded-l-xl">
                                     <div className="flex flex-col">
                                         <span className="text-sm font-bold text-white">{pos.asset}</span>
-                                        <span className="text-[10px] text-slate-500 font-mono">ID: 0x{pos.id}f7...3a2</span>
+                                        <span className="text-[10px] text-slate-500 font-mono">ID: #{pos.id}</span>
                                     </div>
                                 </td>
                                 <td className="py-4 px-4">
