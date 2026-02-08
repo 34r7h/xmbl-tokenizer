@@ -1,23 +1,24 @@
 import { useCallback } from 'react';
 import { useWriteContract, useAccount } from 'wagmi';
-import AgentExecutorABI from '../abis/AgentExecutor.json';
-
-const AGENT_EXECUTOR_ADDRESS = '0x0000000000000000000000000000000000000000'; // Placeholder
+import { useContractConfig } from '../contracts/useContractConfig';
 
 export function useAgentStrategies() {
     const { address } = useAccount();
+    const { getContract } = useContractConfig();
+    const agentExecutor = getContract('AgentExecutor');
+
     const { writeContract: registerInternal } = useWriteContract();
 
     const registerStrategy = useCallback(async (type: string, data: string) => {
-        if (!address) return;
+        if (!address || !agentExecutor) return;
 
         registerInternal({
-            address: AGENT_EXECUTOR_ADDRESS,
-            abi: AgentExecutorABI,
+            address: agentExecutor.address,
+            abi: agentExecutor.abi,
             functionName: 'registerStrategy',
             args: [type, data as `0x${string}`],
         });
-    }, [address, registerInternal]);
+    }, [address, agentExecutor, registerInternal]);
 
     const parseIntent = async (intent: string) => {
         // This would call StrategyParser.js via an API or server action

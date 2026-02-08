@@ -76,7 +76,9 @@ export function LoanCreator({ assetTokenId = "1" }: { assetTokenId?: string }) {
     const isApproved = isApprovedForAll === true;
 
     // 3. Approve Action
-    const { writeContract: approveAsset, data: approveTxHash, isPending: isApproving } = useWriteContract();
+    // Rename writeContract to writeContractInternal to avoid conflict if needed, 
+    // or just use writeContract from the hook we need for the Mint button too.
+    const { writeContract, data: approveTxHash, isPending: isApproving } = useWriteContract();
 
     const { isLoading: isWaitingApproval } = useWaitForTransactionReceipt({
         hash: approveTxHash,
@@ -93,7 +95,7 @@ export function LoanCreator({ assetTokenId = "1" }: { assetTokenId?: string }) {
 
     const handleApprove = () => {
         if (!assetTokenizer || !loanFactory) return;
-        approveAsset({
+        writeContract({
             address: assetTokenizer.address,
             abi: assetTokenizer.abi,
             functionName: 'setApprovalForAll',
@@ -197,6 +199,25 @@ export function LoanCreator({ assetTokenId = "1" }: { assetTokenId?: string }) {
                         <p className="text-rose-400 text-sm font-bold">You do not own Asset #{assetTokenId}.</p>
                         <p className="text-slate-400 text-xs mt-1">Acquire the asset or tokenize a new one.</p>
                     </div>
+                ) : (!ownerOfAsset) ? (
+                    <button
+                        type="button"
+                        onClick={() => {
+                            // Quick mint action for demo purposes
+                            if (assetTokenizer) {
+                                writeContract({
+                                    address: assetTokenizer.address,
+                                    abi: assetTokenizer.abi,
+                                    functionName: 'mint',
+                                    args: [address, "https://example.com/metadata.json", 100000] // Value
+                                });
+                            }
+                        }}
+                        className="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-white font-bold rounded-xl transition-all shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2"
+                    >
+                        <PlusCircle size={20} />
+                        Mint Asset #{assetTokenId} (Demo)
+                    </button>
                 ) : !isApproved ? (
                     <button
                         type="button"

@@ -42,7 +42,7 @@ export function useYellowNetwork() {
                 address: usdc.address,
                 abi: usdc.abi,
                 functionName: 'approve',
-                args: [yellowBridge.address, parseUnits(amount, 6)],
+                args: [yellowBridge.address, parseUnits(amount, 18)],
             });
             console.log("Yellow: Approval Tx Sent:", approvalTx);
             await publicClient?.waitForTransactionReceipt({ hash: approvalTx });
@@ -55,7 +55,7 @@ export function useYellowNetwork() {
                 address: yellowBridge.address,
                 abi: yellowBridge.abi,
                 functionName: 'startSession',
-                args: [tokenAddress || usdc.address, parseUnits(amount, 6)],
+                args: [tokenAddress || usdc.address, parseUnits(amount, 18)],
             });
             console.log("Yellow: Session Tx Sent:", sessionTx);
 

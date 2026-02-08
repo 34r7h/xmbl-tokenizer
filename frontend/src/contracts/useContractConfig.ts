@@ -15,6 +15,16 @@ export const useContractConfig = () => {
             if (localDeployments) {
                 try {
                     const parsed = JSON.parse(localDeployments);
+
+                    // SPECIAL CASE: Fallback USDC -> MockERC20
+                    if (name === 'USDC' && !parsed[name] && parsed['MockERC20']) {
+                        console.log("useContractConfig (Local): USDC not found, using MockERC20");
+                        return {
+                            address: parsed['MockERC20'].address as `0x${string}`,
+                            abi: (deployments as any)['MockERC20']?.abi ? (typeof (deployments as any)['MockERC20'].abi === 'string' ? JSON.parse((deployments as any)['MockERC20'].abi) : (deployments as any)['MockERC20'].abi) : []
+                        };
+                    }
+
                     if (parsed[name] && parsed[name].address) {
                         return {
                             address: parsed[name].address as `0x${string}`,
@@ -34,7 +44,17 @@ export const useContractConfig = () => {
 
         // 2. Fallback to Static config (deployments.json)
         // @ts-ignore
-        const contractData = deployments[name];
+        let contractData = deployments[name];
+
+        // SPECIAL CASE: Fallback USDC -> MockERC20 if USDC is missing but MockERC20 exists
+        if (!contractData && name === 'USDC') {
+            // @ts-ignore
+            if (deployments['MockERC20']) {
+                console.warn("useContractConfig: USDC not found, falling back to MockERC20");
+                // @ts-ignore
+                contractData = deployments['MockERC20'];
+            }
+        }
 
         // Type guard to ensure we have a contract object, not a string/number
         if (!contractData || typeof contractData !== 'object' || !('address' in contractData)) {
