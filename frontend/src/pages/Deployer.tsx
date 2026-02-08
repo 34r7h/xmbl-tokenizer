@@ -43,6 +43,7 @@ export function Deployer() {
     const [isDeployingAll, setIsDeployingAll] = useState(false);
     const [deploymentLogs, setDeploymentLogs] = useState<string[]>([]);
     const [deployedContracts, setDeployedContracts] = useState<Record<string, DeployedContract>>({});
+    const [isLoaded, setIsLoaded] = useState(false);
 
     // Load from local storage on mount
     useEffect(() => {
@@ -55,13 +56,15 @@ export function Deployer() {
                 console.error("Failed to parse deployments", e);
             }
         }
+        setIsLoaded(true);
     }, [chain?.id]);
 
     // Save to local storage whenever deployedContracts changes
+    // Only save if we have loaded the initial state to prevent overwriting with empty object on mount
     useEffect(() => {
-        if (!chain?.id) return;
+        if (!chain?.id || !isLoaded) return;
         localStorage.setItem(`deployments_${chain.id}`, JSON.stringify(deployedContracts));
-    }, [deployedContracts, chain?.id]);
+    }, [deployedContracts, chain?.id, isLoaded]);
 
 
     const handleArgChange = (name: string, value: string) => {

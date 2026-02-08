@@ -15,9 +15,22 @@ export function LoanCreator({ assetTokenId = "1" }: { assetTokenId?: string }) {
     const { switchChain } = useSwitchChain();
     const { getContract } = useContractConfig();
 
-    // Force Localhost/Hardhat (31337)
-    const TARGET_CHAIN_ID = 31337;
-    const isWrongNetwork = isConnected && chainId !== TARGET_CHAIN_ID;
+    // Allow Localhost (31337) or Sepolia (11155111)
+    const isWrongNetwork = isConnected && chainId !== 31337 && chainId !== 11155111;
+
+    // Debug
+    useEffect(() => {
+        if (isConnected) {
+            const at = getContract('AssetTokenizer');
+            const lf = getContract('LoanFactory');
+            console.log("LoanCreator Debug:", {
+                chainId,
+                AssetTokenizer: at?.address,
+                LoanFactory: lf?.address,
+                User: address
+            });
+        }
+    }, [isConnected, chainId]);
 
     const { writeContract: createLoan, isPending: isCreating } = useWriteContract({
         mutation: {
@@ -174,10 +187,10 @@ export function LoanCreator({ assetTokenId = "1" }: { assetTokenId?: string }) {
                 ) : isWrongNetwork ? (
                     <button
                         type="button"
-                        onClick={() => switchChain({ chainId: TARGET_CHAIN_ID })}
+                        onClick={() => switchChain({ chainId: 11155111 })}
                         className="btn-primary mt-2 bg-amber-500 hover:bg-amber-600 border-amber-500/50 text-white"
                     >
-                        Switch to Localhost
+                        Switch to Sepolia
                     </button>
                 ) : !isOwner && ownerOfAsset ? (
                     <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-xl text-center">

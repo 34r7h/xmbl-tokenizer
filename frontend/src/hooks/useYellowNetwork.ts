@@ -18,8 +18,17 @@ export function useYellowNetwork() {
 
     // 1. Start Session
     const startSession = useCallback(async (tokenAddress: string, amount: string) => {
-        if (!address || !yellowBridge || !usdc) {
-            console.error("Yellow: Wallet not connected or contracts missing.");
+        if (!address) {
+            console.error("Yellow: Wallet not connected.");
+            return;
+        }
+        if (!yellowBridge) {
+            console.error("Yellow: Bridge contract not found. Please deploy YellowBridge.");
+            alert("Yellow Bridge contract is not deployed. Please go to the Deployer page and deploy 'YellowBridge'.");
+            return;
+        }
+        if (!usdc) {
+            console.error("Yellow: USDC contract not found. Please deploy MockERC20.");
             return;
         }
 
