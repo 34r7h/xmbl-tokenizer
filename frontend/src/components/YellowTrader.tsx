@@ -1,13 +1,12 @@
 import { useState } from 'react';
 import { useYellowNetwork } from '../hooks/useYellowNetwork';
 import { parseEther, parseUnits } from 'viem';
-import { ArrowLeftRight, Zap, TrendingUp, TrendingDown, Wallet } from 'lucide-react';
-import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { ArrowLeftRight, Zap, TrendingUp, TrendingDown } from 'lucide-react';
 
 export function YellowTrader({ loanToken = "0x..." }: { loanToken?: string }) {
     const [amount, setAmount] = useState('');
     const [price, setPrice] = useState('');
-    const { placeOrder, activeSession, startSession, isConnected } = useYellowNetwork();
+    const { placeOrder, activeSession, startSession } = useYellowNetwork();
 
     const handleLimitOrder = async (side: 'buy' | 'sell') => {
         if (!amount || !price) return;
@@ -66,18 +65,7 @@ export function YellowTrader({ loanToken = "0x..." }: { loanToken?: string }) {
                     />
                 </div>
 
-                {!isConnected ? (
-                    <div className="flex flex-col gap-4 mt-2">
-                        <div className="p-4 bg-slate-900/50 border border-white/10 rounded-xl text-center">
-                            <p className="text-slate-400 text-sm mb-3">
-                                Connect your wallet to access Yellow Network gas-free trading.
-                            </p>
-                            <div className="flex justify-center">
-                                <ConnectButton />
-                            </div>
-                        </div>
-                    </div>
-                ) : !activeSession ? (
+                {!activeSession ? (
                     <div className="flex flex-col gap-4 mt-2">
                         <div className="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-xl text-center">
                             <p className="text-yellow-200 text-sm mb-3">
